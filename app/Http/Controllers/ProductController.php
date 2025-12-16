@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use \App\Models\Product;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -49,15 +50,15 @@ class ProductController extends Controller
         'stock' => 'required|integer',
         'description' => 'nullable',
         'image' => 'nullable|image|max:5120',
-    ]);
+        ]);
 
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('products', 'public');
-    }
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
 
-    Product::create($data);
+        Product::create($data);
 
-    return redirect('/')->with('success', 'Product created');
+        return redirect('/')->with('success', 'Product created');
     }
 
     /**
@@ -73,8 +74,10 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-         return Inertia::render('Product/Edit', [
-            'id' => $id
+        $product = Product::findOrFail($id);
+
+        return Inertia::render('Product/Edit', [
+            'product' => $product
         ]);
     }
 
@@ -82,8 +85,35 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        //
+    { 
+        $product = Product::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|unique:products,sku,' . $product->id,
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+            'description' => 'nullable',
+            'image' => 'nullable|image|max:5120',
+        ]);
+
+        // If new image uploaded
+        if ($request->hasFile('image')) {
+
+            // Delete old image
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            // Store new image
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect('/')
+            ->with('success', 'Product updated successfully');
+        
     }
 
     /**
