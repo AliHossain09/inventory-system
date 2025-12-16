@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Products/Index');
+        return Inertia::render('Product/Index');
     }
 
     /**
@@ -20,7 +20,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Product/Create');
     }
 
     /**
@@ -44,7 +44,7 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return Inertia::render('Product/Edit');
     }
 
     /**
