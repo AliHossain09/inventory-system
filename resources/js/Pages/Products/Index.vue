@@ -1,6 +1,6 @@
 <template>
   <Head title="Welcome" />
-  <h1>Welcome</h1>
+  <h1 font->Welcome</h1>
 </template>
 
 
