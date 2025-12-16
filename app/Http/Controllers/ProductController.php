@@ -7,6 +7,10 @@ use \App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use App\Services\ProductImageService;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+
 class ProductController extends Controller
 {
     /**
@@ -41,24 +45,16 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request, ProductImageService $imageService)
     {
-         $data = $request->validate([
-        'name' => 'required|string|max:255',
-        'sku' => 'required|unique:products,sku',
-        'price' => 'required|numeric',
-        'stock' => 'required|integer',
-        'description' => 'nullable',
-        'image' => 'nullable|image|max:5120',
-        ]);
+        $data = $request->validated();
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
+        $data['image'] = $imageService->store($request->file('image'));
 
         Product::create($data);
 
-        return redirect('/')->with('success', 'Product created');
+        return redirect()->route('product.index')
+        ->with('success', 'Product created');
     }
 
     /**
@@ -84,35 +80,17 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProductRequest $request, Product $product, ProductImageService $imageService)
     { 
-        $product = Product::findOrFail($id);
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|unique:products,sku,' . $product->id,
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'description' => 'nullable',
-            'image' => 'nullable|image|max:5120',
-        ]);
-
-        // If new image uploaded
-        if ($request->hasFile('image')) {
-
-            // Delete old image
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
-
-            // Store new image
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
+        $data = $request->validated();
+        $data['image'] = $imageService->update(
+        $request->file('image'),
+        $product->image
+        );
 
         $product->update($data);
 
-        return redirect('/')
-            ->with('success', 'Product updated successfully');
+        return redirect()->route('product.index');
         
     }
 

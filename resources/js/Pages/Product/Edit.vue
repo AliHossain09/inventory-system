@@ -15,7 +15,7 @@ const product = page.props.product
 
 // Form
 const form = useForm({
-  _method: 'put',   // 🔥 THIS IS THE KEY
+  _method: 'put',   
   name: product.name,
   sku: product.sku,
   price: product.price,
