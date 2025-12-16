@@ -91,7 +91,7 @@ const confirmDelete = (row) => {
   <Head title="Products" />
 
 
-  <div class="p-6 space-y-6">
+  <div class="p-6 space-y-6 shadow-2xl">
    
     <!-- Search -->
     <div class="flex justify-between items-center">
@@ -101,7 +101,7 @@ const confirmDelete = (row) => {
         placeholder="Search by Name or SKU..."
         class="border px-3 py-2 rounded w-64"
       />
-      <Button @click="router.visit('/create')">+ Add Product</Button>
+      <Button @click="router.visit('/create')" class="bg-green-300">+ Add Product</Button>
     </div>
 
 

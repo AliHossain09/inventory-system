@@ -42,7 +42,22 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'sku' => 'required|unique:products,sku',
+        'price' => 'required|numeric',
+        'stock' => 'required|integer',
+        'description' => 'nullable',
+        'image' => 'nullable|image|max:5120',
+    ]);
+
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
+    }
+
+    Product::create($data);
+
+    return redirect('/')->with('success', 'Product created');
     }
 
     /**
