@@ -22,39 +22,103 @@ This project was built as part of a Junior Laravel Developer (Remote) technical 
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+# Installation & Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Clone the repository
+- git clone <your-repo-link>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Go to project directory
+- cd product-inventory
 
-## Laravel Sponsors
+## Install backend dependencies
+- composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Install frontend dependencies
+- npm install
 
-### Premium Partners
+## Environment setup
+- cp .env.example .env
+- php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Configure Database
 
-## Contributing
+#### Update your .env file with database credentials:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- DB_DATABASE=inventory_system_shadCN
+- DB_USERNAME=root
+- DB_PASSWORD=
+ 
+## Run Migrations & Seeders
+- php artisan migrate --seed
 
-## Code of Conduct
+## Storage Link for product images
+- php artisan storage:link
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Run frontend
+- npm run dev
 
-## Security Vulnerabilities
+## Run backend
+- php artisan serve
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 1. Dependency Injection vs Facade Laravel 12
+
+A Facade is Laravel’s shortcut system for accessing services. Dependency Injection means injecting the required class directly through the constructor or method.
+
+#### Differences
+
+- Facades make code shorter but often hide what’s happening behind the scenes.
+
+- Dependency Injection results in cleaner, more testable, and maintainable code.
+
+#### When I Use Dependency Injection
+
+- When working with service classes like file upload logic
+
+- When unit testing is required
+
+- When long‑term maintainability is important
+
+In real‑world projects, Dependency Injection is a safer and more professional approach.
+
+
+## 2. Performance Optimization (Handling 10,000 Products)
+
+Loading all products at once would slow down the application. To optimize performance:
+- Add database indexes on SKU and name.
+- Use pagination instead of loading all records.
+- Optimize search queries using LIKE with proper indexing
+- Avoid eager‑loading relationships unless they are required
+
+This approach keeps page load times fast and reduces server load.
+
+## 3. CSRF Protection with Inertia.js
+
+Laravel generates a CSRF token for every form submission. Inertia.js automatically sends this token with each request.
+
+#### Why Important
+
+- Protects the application from CSRF attacks.
+- Prevents unauthorized form submissionsd.
+
+When using Laravel with Inertia.js, CSRF protection works out of the box and provides security by default.
+
+## 4. N+1 Query Problem & Solution
+If there are 10 products and each product loads its category with a separate query, the total becomes 1 + 10 = 11 queries, which negatively impacts performance.
+
+#### Solution:
+Using eager loading with with(): Product::with('category')->paginate(10);
+This loads all related categories in a single query and significantly improves performance.
+
+## Code Structure Notes
+- Controllers handle only request logic.
+- Image upload logic is handled in a dedicated Service class.
+- Laravel Form Requests are used for validation.
+- Named routes and a clean folder structure are followed.
+
+## Extra Notes
+- SweetAlert is used for delete confirmation dialogs.
+- Tailwind CSS is used for a clean and modern UI.
+- php artisan storage:link is used to make uploaded images publicly accessible.
+
