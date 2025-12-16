@@ -10,3 +10,5 @@ Route::get('/', [ProductController::class, 'index']);
 Route::get('/create', [ProductController::class, 'create']);
 
 Route::get('/edit/{id}', [ProductController::class, 'edit']);
+
+Route::delete('/delete/{id}', [ProductController::class, 'destroy']);

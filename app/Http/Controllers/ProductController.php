@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use \App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -10,9 +11,22 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('Product/Index');
+        
+        $products = Product::query()
+        ->when($request->search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%");
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString(); // important
+
+    return Inertia::render('Product/Index', [
+        'products' => $products,
+        'filters' => $request->only('search')
+    ]);
     }
 
     /**
@@ -36,7 +50,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+       
     }
 
     /**
@@ -44,7 +58,9 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        return Inertia::render('Product/Edit');
+         return Inertia::render('Product/Edit', [
+            'id' => $id
+        ]);
     }
 
     /**
@@ -60,6 +76,9 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->delete(); // Soft delete
+
+        return redirect()->back()->with('success', 'Product deleted successfully.');
     }
 }
